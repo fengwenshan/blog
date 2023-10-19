@@ -6,11 +6,24 @@ export default [
     link: '/'
   },
   {
+    text: '计算机',
+    children: [
+      {
+        text: '计算机网络',
+        link: '/Computed/network/'
+      },
+      {
+        text: 'HTTP权威指南',
+        link: '/Computed/http/base.md'
+      }
+    ]
+  },
+  {
     text: 'JS',
     children: [
       {
         text: 'JavaScript',
-        link: '/JS/base',
+        link: '/JS/base/base.md',
       },
       {
         text: 'Vue2.x实现',
@@ -31,6 +44,15 @@ export default [
     ]
   },
   {
+    text: 'Java',
+    children: [
+      {
+        text: 'Java SE',
+        link: '/Java/base/base.md'
+      }
+    ]
+  },
+  {
     text: 'C&CPP',
     children: [
       {
@@ -39,8 +61,4 @@ export default [
       }
     ],
   },
-  {
-    text: 'HTTP',
-    link: '/HTTP/',
-  }
 ]

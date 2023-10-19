@@ -5,14 +5,16 @@ export default {
       children: [
         '/JS/base/base.md',
         '/JS/base/object.md',
+        '/JS/base/function.md',
+        '/JS/base/iterators.md',
         '/JS/base/base-object.md',
         '/JS/base/date.md',
         '/JS/base/regexp.md',
         '/JS/base/array.md',
         '/JS/base/type-array.md',
         '/JS/base/map.md',
-        '/JS/base/iterators.md',
-        '/JS/base/function.md',
+
+
         '/JS/base/async.md',
         '/JS/base/proxy.md',
         '/JS/base/module.md',

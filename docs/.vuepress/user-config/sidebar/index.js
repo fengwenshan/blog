@@ -1,4 +1,6 @@
-export { default as vue2 } from './vue2_x'
+export { default as vue } from './vue'
 export { default as js } from './js'
 export { default as node } from './node'
 export { default as c } from './c'
+export { default as computed } from './computed'
+export { default as java } from './java'

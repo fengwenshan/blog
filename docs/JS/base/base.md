@@ -1,126 +1,296 @@
-# 基础
+# 类型转换
 
 ## 数据类型
 
 - 基本数据类型：Number、Boolean、String、Null、Undefined、System(ES6新增)、Bigint(ES10新增)
-- 引用数据类型：Object(function、array、Date、Math等)
+- 引用数据类型：Object
 
-`typeof`操作符可以用来确定任意变量的数据类型，返回值：`"undefined"`、`"boolean"`、`"string"`、`"number"`、`"object"`、`"number"`、`"object"`、`"function"`、`"symbol"`
+`typeof`操作符可以用来确定任意变量的数据类型，返回值：`"undefined"`、`"boolean"`、`"number"`、`"string"`、`"object"`、`"function"`、`"symbol"`、`"bigint"`
 
-`typeof` `string`、`boolean`、`number`、`object`、`function`、`undefined`都会返回相应的字符串形式，array会返回`"object"`；null会返回`"object"`,因为null被认为空对象引用。
+```javascript
+console.log(typeof '12213'); // 'string'
+console.log(typeof 123); // 'number'
+console.log(typeof true); // 'boolean;
+console.log(typeof undefined); // 'undefined'
+console.log(typeof null); // 'object'
+console.log(typeof {}); // 'object'
+console.log(typeof []); // 'object'
+console.log(typeof function() {}); // 'function'
 
-函数在ECMAScript中被认为是对象，并不代表数据类型。typeof操作返回function, 就是因为函数有自己特殊的属性。为此就有必要通过typeof操作符来区分函数和其他对象。
+console.log(typeof Symbol('id')) //'symbol'
 
-`undefined` 一般情况下使用`void 0`表示，因为`undefined`不是关键字可以当做变量名使用
+console.log(typeof 10n); // 'bigint'
+```
 
-`undefined` 和 `null` 区别
+::: tip typeof 函数为什么返回function
+JavaScript中的函数是一种特殊对象，它们是可以调用的对象。虽然函数是对象，但它们有一些独特特性：
 
-- undefined可以认为是系统级别的，如果一个变量没有赋值，那么默认为undefined, null是应用级别的，所以说永远不要显示地设置值为undefined
-- undefined值是由null值派生而来的
+- 可调用性：函数可以被调用，这是它们的主要目的。其他对象没有这个特性。
+- Function构造函数：函数在JavaScript内部都是通过`Function`构造函数创建的。这就是为什么函数在typeof操作符下返回"function"。
+- 内部属性和方法：函数对象包括内部属性和方法：如length、name、apply、bind等, 这些属性和方法使函数在语言内部有特殊作用。
+
+因此，虽然函数是对象的一个特殊类型，但它们有自己的行为和特性，这就是为什么 typeof function 返回 "function" 的原因。
+:::
+
+::: tip undefined 与 null区别
+
+undefined: 表示一个声明但未赋值的变量、 一个函数没有返回值时的默认返回值、访问对象的不存在属性时，返回undefined
+null: 表示一个特殊的空值，通常用于显示地表示一个变量应该为空或者没有值。通常用于重置对象属性或表示变量不引用有效对象。
+
+区别：
+
+1. undefined是变量在声明后单尚未赋值时的默认值（系统级别），而null需要显示分配给变量。
+2. 当想表示变量尚未初始化时，通常使用`undefined`或 `void 0`。而想要表示变量为空或不引用有效对象时，通常使用`null`
+3. typeof判断的时候，undefined会返回自身的字符串表示。而null会返回`"object"`。
+
+**建议**：永远不要显示地将变量值设置为undefined.但null可以。任何时候只要变量要保存对象，而当时又没有那个对象可以保存，就要用null来填充。这样就可以保持null是空指针的语义，从而进一步与undefined分开。
+:::
+
+::: tip typeof null 返回 "object"
+这是一个历史遗留问题，可以说是设计缺陷。这是由于JS早期版本在处理`null`值时出现的问题，导致`null`被错误地标识为对象。
+
+在JavaScript的早期版本中，使用32位系统，其中前3位用于表示值得类型标签。在这个设计中，`000`表示对象，而`null`的二进制表示全为0，因此被错误地解释为对象。
+
+实际上`null`是一种特殊的空值，不是对象。它表示变量不引用任何有效对象。
+:::
+
+
+::: tip undefined == null 返回true
+
+不是隐式类型转换。如果和其他类型进行比较会涉及到隐式类型转换。
+
+在ECMAScript-262第3版之前是不存在的。增加这个特殊值得目的就是为了正式明确空对象指针（null）和未初始化变量的区别。
+
+undefined值是由null值派生而来的，因此ECMA-262将它们定义为表面上相等。
+:::
+
+## Boolean
+
+不同类型与布尔值之间的转换规则
+
+| 数据类型       | 转换为false  |
+|-----------|-----------|
+| Boolean    | false     |
+| String   | ""        |
+| Number     | 0、NaN     |
+| Object    | null      |
+| Undefined | undefined |
+
+注意：基本数据类型中三个有包装对象，包装对象也是对象，返回true。
 
 ## Number 
 
-JS不区分整数类型与浮点类型，所有值均使用浮点类型表示。采用IEEE 754标准定义64位浮点格式表示数字，这意味着它能表示的最大值为±1.7976931348623157e308`Number.MAX_VALUE`，最小值±5e-324`Number.MIN_VALUE`。（安装JS的数字格式，能够表示整数范围是从-9 007 199 254 420 992 ~ 9 007 199 254 420 992，也就是±2^53，包含边界值。如果超出这个范围就无法保证低位数字的精度，然而JS中实际操作则是基于32位,操作完成转为64位。） ，如果超出了JS表示范围，那么这个值就会转换为`Infinity（无穷）`值。任何无法表示的负数以`-Infinity（负无穷）`表示。
+JS不区分整数类型与浮点数类型，所有值均使用浮点类型表示。与大部分编程语言一样，JS中数字类型是基于IEEE 754标准实现，该标准通常也称为“浮点数”。JS使用”双精度“格式（即64位二进制）
 
-如果是为`±Infinity`，该值就不能进一步计算了，这是因为它没有可用于计算的数值表示形式。可以用`isFinite()`判断一个值是否在`±Infinity`之间（Finite检测传入的参数是否是一个有穷数）。也可以使用`Number.NEGATIVE_INFINITY`判断是否为`-Infinity`,`Number.POSITIVE_INFINITY`判断是否为`Infinity`。
+因为JS中所有数字都是64位浮点格式表示，所以能表现的最大值为：`Number.MAX_VALUE === 1.7976931348623157e308`，最小值`5e-324 === Number.MIN_VALUE`。
 
-当数字运算结果超过JS所能表示的数字上线（溢出），结果为一个特殊的无穷大（infinity）值, JS以Infinity表示，同样负数超出时候用-Infinity表示，计算的符号位还是不变的。
+JS整数范围是从-9 007 199 254 740 991 ~ 9 007 199 254 740 991（即pow(-2, 53) + 1 ~ pow(2, 53) -1）,最大值可以使用Number.MAX_SAFE_INTEGER表示，最小值使用Number.MIN_SAFE_INTEGER表示。
 
-被0整除程序不会报错，会返回±Infinity， 有一个例外0 除以 0 这种没有意义的，是一个非数字（not-a-number）值，用NaN表示。无穷大除以无穷大、给任意负数做开方运算、算术运算符与不是数字或无法转换为数字的操作数一起使用时都将返回NaN。
+边界：如果超过这个范围，最大值上溢为Infinity，下溢-Infinity, 最小值下溢为0, 当一个负数发生下溢的时候会返回-0。
 
 JS预定义全局变量：Infinity、NaN。在ES3的时候是可以修改的，ES5修正了这个错误。
 
-下溢（underflow）是当运算结果无限接近于零并比JS能表示的最小值还小发生的情况，这种情况下JS会返回0，当一个负数发生下溢的时候会返回-0，这个和0是一样的。
-
-数字计算有上下溢出，那么还有非法计算，那么就会返回`NaN`,代表不是一个数值。对NaN进行操作，都会返回NaN。可以使用`isNaN()`判断是否是NaN，也可以使用`x != x`来判断，因为NaN它和任何值都不想等，包括自身
-
-
-
-`isNaN()`接收一个任意类型参数进行判断是否为NaN, 会进行隐式类型转换，然后判断这个值是否“不是一个数值”。（首先调用对象的valueOf()方法，然后判断返回的值是否可以转换为数值。如果不能再调用toString()方法，并返回值）
-
+:::tip Infinity计算
 ```javascript
-// 在ECMAScript中，0、+0、-0相除会返回NaN 
-0 / 0
--0 / +0
+console.log(isFinite(-Infinity)) // true
+console.log(Number.NEGATIVE_INFINITY); // -Infinity
+console.log(Number.POSITIVE_INFINITY); // Infinity
 
-// 如果分子是非0值，分母是有无符号0，则会返回Infinity或Infinity
-5 / 0
-5 / -0
+console.log(0 / Infinity) // 0
+console.log(0 / -Infinity) // -0
 
-// isNaN
-isNaN(NaN) // true
-isNaN(10) // false
-isNaN("10") // true 
-isNaN("blue") // false 
-isNaN(false) // true 转换数值0
+console.log(2 / 0) // Infinity
+console.log(-2 / 0) // -Infinity
+
+console.log(Infinity / 0) // Infinity
+console.log(-Infinity / 0) // -Infinity
+
+// 以下非法操作
+console.log(0 / 0) // NaN
+console.log(-Infinity/ Infinity) // NaN
+console.log(-Infinity % Infinity) // NaN
 ```
-
-进制表示：二进制（0b开始），八进制（0、0o、0O开始），十六进制数字（0x 或 0X开始）。注意如果8进制赋值，以0开始,如果超出8进制范围则会解析为十进制，比如079，则会解析为79, 编辑器里面也会报错：`Octal literals are not allowed. Use the syntax '0o79'.javascript`不允许使用8进制文字，请使用0o79文字，使用0o79编译器也会报错，不符合预期，浏览器直接运行也会报错。
-
-
-::: tip 数字错误
-实数有无数个，但JS通过浮点数的形式只能表示其中有限个数（确切来说18 437 736 874 454 810 627个）。也就是说，当JS中使用实数的时候，常常只是真实值的一个近似表示。
-
-JS采用IEEE754浮点数表示（几乎所有语言都是），这是一种二进制表示法，可以精确地表示分数。遗憾的是我们一般常用十进制分数表示。二进制浮点数表示法并不能精确表示类似0.1这样简单的数字。例如：`0.3 - 0.2 === 0.2 - 0.1`， 答案是false, `0.2 - 0.1 === 0.1`, 返回true, 但是`0.3 - 0.2 === 0.1` 并不是返回true。 由于舍入误差，0.3 - 0.2之间的近似差值实际上并不等于0.2 - 0.1之间的近似差值，这个问题不只是JS中才会出现，在任何使用二进制浮点类型编程语言中都有这个问题。上面两个计算都是非常接近最终的确定值。这种计算可以胜任大多数计算任务：这个问题也只有在比较两个值是否相等的时候才会出现。
 :::
 
-[类型转换官方文档](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Data_structures#%E5%BC%BA%E5%88%B6%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2)
+::: tip 除数与被除数
+6 / 2 = 3  -> 2被6除， 6被除数，2是除数。
 
-**隐式类型转换**
+在数学中被除数（分母）不能为0。在实数中，整数除以0得到正无穷，负数除以0得到负无穷。
 
-- 数值比较，直接比较，不进行转换
-- 字符串js会进行Number处理，然后数值比较
-- boolean 也会使用Number处理，然后数值比较
-- 对象与数值比较：
-  - 判断对象是否具有valueOf方法，且调用返回一个原始值，js将其转换为数字
-  - 否则，判断对象是否具有toString()方法，且调用返回一个原始值，js将其转换为数字
-  - 否则JS抛出一个类型错误
+在编程中，具体行为可能会因编程语音而异，在JS中实数除以0，会变为特殊值 Infinity 或 -Infinity，因为js使用IEEE 954浮点数标准，它定义了这种行为。
 
-**显示类型转换**
+扩展乘法特殊点：在数学中0乘任何数都为0，但是在js中`Infinity * 0`返回NaN，因为涉及到浮点数特殊规则。
+:::
 
-有三个函数将非数值转换为数值：`Number()`、`parseInt()`、`parseFloat()`
+::: tip NaN
+NaN: Not a Number（不是一个数值），js中进行非法操作就会返回
 
-- Number规则：
-  - boolean值true -> 1, false -> 0
-  - 数值直接返回
-  - null -> 0
-  - undefined -> NaN、
-  - 字符串：
-    - 空字符串返回0
-    - 字符串纯数字（包含浮点数）（有无符号）转换为十进制数值，如果前面有0直接忽略
-    - 进制数字字符串会转换为十进制数字
-    - 其余都转换为NaN
-  - 对象，先调用valueOf方法，然后按照上面规则转换。结果为NaN,则调用toString()方法，再按照转换字符串的规则转换
-- parseInt和parseFloat的方法差不多，一个是转换为整数，一个是转换为浮点数（如果本身就是整数，那么和parseInt一样）
-  - 相比于Number, 这两个方法要相对宽松很多，首先排除前面空格（Number也会）、然后读取第一个字符串是否是数字（十进制），如果是则继续，解析到不是数字为止，然后裁切并返回；如果第一个不是数字则会直接返回NaN
-  - 空字符串会返回NaN
-  - parseInt 有第二个参数，表示进制， 代表第一个参数是几进制表示的。如果解析到浮点数，则会保留整数部分
-  - parseFloat 始终解析10进制，如果是16进制则会返回0，且不能指定底数
+- 0除以0： 在数学中，0除以0是一个不定形式或无效操作，通常没有一个单一的确定解。这意味着0除以0并不等于一个特定的数，因为它在数学上没有明确定义结果，这个情况有时表示为0/0
+- 给负数做开方，负数不能开方
+- 算数运算符与不是数字 或者无法转换为数字的操作数 一起使用
+- NaN进行比较的时候都会返回false（包括与自己比较），可以使用`isNaN()`函数或`x != x`
+
+分析0/0: 首先0/0本身就是非法操作，所以返回NaN。优先级比任何数除以0返回无穷大高
+
+isNaN底层实现：首先调用参数的valueOf(), 然后判断返回值是否可以转换为数值，如果不能，则调用toString()方法，并测试其返回值。这也是ECMAScript内置函数和操作符的工作方式。
+:::
+
+Number提供三种方法，强制将非数值转换为数值：Number、parseInt、parseFloat。
+
+小技巧：如果写一个输入框，输入`3.`时候输入框应该显示`3.0`, 实际绑定`3`, 可以使用`Number`,虽然parseFloat可以实现，但是它会裁切后面字符串，而Number直接返回NaN.
+
+**Number()方法**
+
+- 数值直接返回（Infinity这个也是数值）
+- null 返回 0
+- undefined 返回NaN
+- bool值，true返回0，false返回-1
+- 字符串将被假定为包含数字字面量，并通过解析它们来转换。解析失败返回NaN：
+  - 解析前忽略前置后尾随的空格或换行符，忽略前置0（不会导致该值称为8进制）。
+  - `+`和`-`允许出现在字符串的开头以表示符号位。只能出现这一次，后面不能跟空格。
+  - "" 或 " " 转换为0
+  - 浮点值字符串，转换为相应的浮点值
+  - 十六进制字符串，则会转换为与该十六进制对应的十进制整数值。
+  - BigInt、Symbol抛出TypeError。前者防止精度损失。
+  - 其余都是返回NaN
+- 对象首先就通过按殊勋调用它们的`[@@toPrimitive]()`、`valueOf()`、`toString()`方法将其转换为原始值。然后将得到的原始值转换为数字。
 
 
+Symbol.toPrimitive 是内置的 symbol 属性，其指定了一种接受首选类型并返回对象原始值的表示的方法。它被所有的强类型转换制算法优先调用。
 
+Number.parseFloat() 和 Number.parseInt() 与 Number() 相似，但只能转换字符串，并且解析规则略有不同。例如，parseInt() 无法识别小数点, 可以转换进制，parseFloat() 无法识别 0x 前缀。
+
+
+JS中的浮点值内存空间是整数的两倍，所以ECMAScript总是想办法把值转换为整数。如果值比较大那么使用科学计数法。
+
+
+:::tip 经典计算问题0.1 + 0.2 === 0.3返回false。
+上面说到JS采用IEEE-754浮点数表示（几乎所有语言都是）, 是一种二进制表示法，通过64位来表示一个数字（1 + 11 + 52）。
+- 1符号位（二进制符号位）
+- 11 指数位（e -1022到1023）
+- 52尾数，小数部分（即有效数字,0和1之间的数值）
+
+当0.1和0.2转换为二进制时，会出现无限循环，而双进度浮点数小数部分最多支持52位，超过52位部分就会被截断，然后进行二进制计算，计算完成转为十进制，这个过程就已经出现误差，这个误差的部分就是被计算机阶段的部分导致。
+
+解决方案有两种：
+
+方案1: Number.EPSILON 静态数据属性表示 1 与大于 1 的最小浮点数之间的差值,因为双精度浮点格式只有52位来表示尾数，并且最低位的有效值位`pow(2, -52)`
+
+```javascript
+function equal(x, y) {
+  return Math.abs(x - y) < Number.EPSILON;
+}
+
+const x = 0.2;
+const y = 0.3;
+const z = 0.1;
+console.log(equal(x + z, y)); // true
+```
+
+方案二：获取加数中最多的小数位数 e，所有的加数同时放大 Math.pow(10, e) 倍，进行计算之后的结果再缩小 Math.pow(10, e) 倍
+:::
+
+
+进制：二进制（0b）0-1， 八进制（0o或0O）0-7, 十六进制（0x或0X）开始0-9与a-f组合。越界报错
+
+
+```javascript
+const a = 0b1111
+console.log(a) // 15
+
+const b = 0o77
+console.log(b) // 63
+
+// VM78:1 Uncaught SyntaxError: Invalid or unexpected token
+// console.log(0o79)
+
+const c = 0xff
+console.log(c) // 255
+```
+
+
+## BigInt
+
+在 JavaScript 中，“number” 类型无法安全地表示大于 pow(2, 53) -1（即 9007199254740991），或小于 pow(-2, 53) + 1 的整数。所以ES10添加BigInt类型，用于表示任意长度的整数。
+
+对 bigint 的所有操作，返回的结果也是 bigint。不要把bigint和常规数字类型混合使用，会报错
+
+```javascript
+// 尾部的 "n" 表示这是一个 BigInt 类型
+const bigInt = 1234567890123456789012345678901234567890n;
+const sameBigint = BigInt("1234567890123456789012345678901234567890");
+const bigintFromNumber = BigInt(10); // 与 10n 相同
+
+console.log(1n + 2n); // 3
+
+console.log(5n / 2n); // 2
+
+
+// 将 number 转换为 bigint
+alert(bigint + BigInt(2)); // 3
+
+// 将 bigint 转换为 number
+alert(Number(1n) + number); // 3
+```
+
+比较
+
+```javascript
+// BigInt 和 Number 不是严格相等的，但是宽松相等的。
+console.log(0n === 0) // false
+console.log(0n == 0) // true
+
+console.log(1n < 2) // true
+console.log(2n > 1) // true
+```
+
+转换操作始终是静默的，绝不会报错，但是如果 bigint 太大而数字类型无法容纳，则会截断多余的位，因此我们应该谨慎进行此类转换。
+
+对任何 BigInt 值使用 JSON.stringify() 都会引发 TypeError，因为默认情况下 BigInt 值不会在 JSON 中序列化。但是，如果需要，可以实现 toJSON 方法：
+
+```javascript
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
+
+JSON.stringify(BigInt(1)); // '"1"'
+```
 
 ## String
 
 
-**string类型是一组由16位值组成的不可变的有序序列（需要必须先销毁原始字符串，然后新值保存在该变量中）**，每个字符通常来自于Unicode字符集。JS中通过字符串类型来表示文本。字符串长度是其所含16位值得个数。JS中字符串（和数组）的索引都是从0开始的
+JS采用UTF-16编码的Unicode字符集，是由一组无符号的16位值组成的序号.在UTF-16编码中，每个码元都是16位长。这意味着最多有pow(2, 16)或65535个可能的字符可表示为单个UTF-16码元。每个码元都可以用`\u`开头的4个十六进制数字写在字符串中。
 
-JS采用UTF-16编码的Unicode字符集，是由一组无符号的16位值组成的序号。最常用的Unicode字符都是通过16位的内码表示，并代表字符串中的单个字符，那些不能表示为16位的Unicode字符则遵循UTF-16编码规则——用两个16位值组成的一个序列表示。这意味着一个长度为2的JS字符串有可能表示一个Unicode字符，一般情况表情是占用两个字符的。JS定义各式字符串操作方法均作用于16位值，而非字符，且不会对代理项做单独处理，同样JS不会对字符串做标准化的加工，甚至不能保证字符串是合法的的UTF-16格式
+然而，整个Unicode字符集比65536大的多。二外的字符以代理对的形式存储UTF-16中，代理对是一对16码元，表示一个单个字符。为了避免歧义，配对的两个部分必须介于`0xD800`和`0xDFFF`之间，并且这些码元不用于编码单码元字符。（更准确地说，前导代理，也称为高位代理，其值在 `0xD800` 和 `0xDBFF` 之间（含），而后尾代理，也称为低位代理，其值在 `0xDC00` 和 `0xDFFF` 之间（含）。）每个 Unicode 字符由一个或者两个 UTF-16 码元组成，也称为 Unicode 码位（code point）。每个 Unicode 码位都可以使用 \u{xxxxxx} 写成一个字符串，其中 xxxxxx 表示 1–6 个十六进制数字。
 
-字符串表示可以使用单引号，双引号或反引号包裹内容，在ES3字符串只能写在一行，ES5可以拆分多行，使用反斜杠(\)结束，反斜杠和行结束符都不算是字符串直接量的内容。如果希望在字符串中另起一行，可以使用转义字符\n
+```javascript
+"😄".split(""); // ['\ud83d', '\ude04']; splits into two lone surrogates
 
-注意当使用单引号字符串时需要小心在里面使用单引号，需要使用反斜杠（\）转义
+// "Backhand Index Pointing Right: Dark Skin Tone"
+[..."👉🏿"]; // ['👉', '🏿']
+// splits into the basic "Backhand Index Pointing Right" emoji and
+// the "Dark skin tone" emoji
 
-string类型转换规则如下：
+// "Family: Man, Boy"
+[..."👨‍👦"]; // [ '👨', '‍', '👦' ]
+// splits into the "Man" and "Boy" emoji, joined by a ZWJ
 
-- 基本数据类型，默认直接调用toString方法
-- 引用数据类型。
-  - 判断是否有toString()方法，且调用返回原始值
-  - 否则判断是否有valueOf()方法，且调用返回原始值
-  - 如果两者都没有将抛出一个类型错误异常
-- 数组的默认toString()方法经过重新定义，将所有单元字符串化后再用 ',' 分隔，连接起来。
+// The United Nations flag
+[..."🇺🇳"]; // [ '🇺', '🇳' ]
+// splits into two "region indicator" letters "U" and "N".
+// All flag emojis are formed by joining two region indicator letters
+```
 
-null和undefined一般没有toString()方法, 如果需要把他们转换为字符串需要显示调用String()函数
+字符串强制类型转换：许多内置操作首先将它们的参数强制转换为字符串（这就是为什么String对象的行为类似于字符串原始值的原因）
+
+- 字符串直接返回
+- undefined和null 本身直接转为字符串形式展示
+- true, false 转换成字符串相应表示。
+- 使用与`toString(10)`想同的算法转换数字
+- Symbol抛出TypeError
+- 对于对象，首先，通过依次调用其`[@@toPrimitive]()`（hint 为 "string"）、toString() 和 valueOf() 方法将其转换为原始值。然后将生成的原始值转换为一个字符串。
+
+
 
 - `JSON.stringify()`在将JSON对象序列化为字符串时也用到了ToString的相关规则：
   - 大多数情况下JSON字符串化和toString()效果基本相同，只不过序列化的结果总是字符串（42 -> "42"、"42" -> ""42""、null -> "null"、"true" -> "true"）,所有安全JSON值都可以使用该方法
@@ -147,34 +317,88 @@ JSON.stringify(b) // "{ "n": 42 }"
 ```
 
 
+## 隐式类型转换
+
+- Boolean与其他类型对比, 先将Boolean转换成Number类型，然后再次对两个操作数进行宽松比较。
+- Number与String, 将String转换为Number. 转换失败会得到NaN。
+- Number 转 BigInt：按照其数值进行比较。如果 Number 是 ±Infinity 或 NaN，返回 false。
+- String 转 BigInt: 使用与 BigInt() 构造函数相同的算法将字符串转换为 BigInt。如果转换失败，则返回 false。
+- 对象将依次调用它的 `[@@toPrimitive]()`（将 default 作为 hint 值）、`valueOf()` 和 `toString()` 方法，将其转换为原始值。注意，原始值转换会在 `toString()` 方法之前调用 `valueOf()` 方法。字符串顺序第二个和第三个顺序调换
 
 
+```javascript
+// 当数组进行比较的时候，那么数组会先调用valueOf()进行转换，如果是原始值，则进一步进行原始值比较。如果是不是原始值，则继续调用toString()方法转换为原始值，如果不是则报错
+// 数组重写了toString方法，内部实现join(',')
+function def(target, key, value) {
+  Object.defineProperty(target, key, {
+    configurable: true,
+    enumerable: false,
+    writable: true,
+    value,
+  })
+}
 
 
-## Boolean
-
-JS中的值可以分为以下两类：
-
-- 可以被强制类型转换为false的值：
-  - 空字符、
-  - 0、
-  - NaN
-  - null、undefined
-- 其他（被强制类型转换为true的值）（所有对象（函数和数组）都转换为true.包装对象也是这样）
+// 数组没有valueOf, 调用的是对象的
+def(Array.prototype, 'valueOf', function(...args) {
+  console.log('我是数组valueOf', Object.prototype.valueOf.call(this, ...args))
+  return Object.prototype.valueOf.call(this, ...args)
+  // return this.join(...args)
+})
 
 
+// 数组有toString
+const arrTostring = Array.prototype.toString
+def(Array.prototype, 'toString', function(...args) {
+  console.log('我是数组toString', arrTostring.call(this, ...args))
+  return arrTostring.call(this, ...args)
+  // return this
+})
 
-## 一元操作符
+if(1 == [1]) {
+  console.log('相等')
+} else {
+  console.log('不相等')
+}
+/*
+我是数组valueOf [ 1 ]
+我是数组toString 1
+相等
+*/
 
-`++`与`--`无论是前缀还是后缀，变量值都会在语句被求值之前或之后改变（在计算机科学中，通常叫副作用）。这种操作符可以适用于任意数据类型，但是遵循以下操作：
+/** 下面是对象内容，输出顺序和数组一致
+ * 我是对象valueOf { key: 1 }
+ * 我是对象toStringf [object Object]
+ * 不相等
+ */
+const objValueOf = Object.prototype.valueOf
+const objtoString = Object.prototype.toString
 
-- 字符串：如果是有效数值形式（使用Number()进行判断），则转换为数值再改变。变量类型从String -> Number；如果不是有效数值则会返回NaN。
-- bool：如果是false则转换为0， true则为1。变量类型从Boolean -> Number
-- object: 变量类型从Boolean -> Number
-  - array: 对象具有valueOf() 方法，返回一个原始值，JS则会将其转换为数字；否则，如果对象具有toSting方法，返回原始值，JS将其转换并返回，否则，JS抛出一个类型错误异常
-  - 其他：如果对象具有toString()方法，调用返回一个原始值，JS则会将其转换为字符串；否则，如果对象具有valueOf() 方法，调用返回一个原始值，JS则会将其转换为字符串；JS无法从toString()或valueOf方法获得一个原始值，将会抛出一个类型错误异常
+def(Object.prototype, 'valueOf', function(...args) {
+  console.log('我是对象valueOf', objValueOf.call(this, ...args))
+  return objValueOf.call(this, ...args)
+})
 
-一元加减`+`、`-`同理。如果放在`=`前面就是计算。如果放在变量前面就是改变变量的符号，正数改为负数，负数改为正数。
+def(Object.prototype, 'toString', function(...args) {
+  console.log('我是对象toStringf', objtoString.call(this, ...args))
+  return objtoString.call(this, ...args)
+})
+
+if(1 == {key: 1}) {
+  console.log('相等')
+} else {
+  console.log('不相等')
+}
+```
+
+## Symbol
+
+Symbol出现背景，在之前对象的属性名都是字符串，可能造成属性名的冲突，从而出现覆盖问题。Symbol的出现就是解决这个问题，它的机制就是保证每个属性的名字都是独一无二的。
+
+```javascript
+// 不能使用new, 因为它是原始数据类型
+const s = Symbol()
+```
 
 ## 位运算符
 
@@ -245,116 +469,7 @@ value >>> 5 // 134 217 726
 - 如果第一个值为假值，那么就会返回第二个值
 - 如果第一个值为真值，那么直接返回第一个值
 
-## 乘性、除法、指数、加减操作符
 
-> 乘性操作符： 乘法、除法和取模。乘性操作符不是数值的操作数，则该操作数会在后台被使用`Number()`转型函数转换为数值。这意味者假值就会被转换为0
-
-乘法操作符会遵循以下规则：
-
-- 如果ECMAScript不能表示乘积，则返回`Infinity`或`-Infinity`
-- 使用Infinity进行计算也会返回Infinity, 符号位保留
-- 如果有任意操作数为NaN, 则返回NaN。Infinity * 0，也会返回NaN
-- 如果不是数值的数，则会进行`Number()`转换，然后进行上诉规则
-
-除法操作符会遵循以下规则：
-
-- 如果ECMAScript不能表示商，则返回`Infinity`或`-Infinity`
-- Infinity除以任何值，都会返回Infinity, 符号位保留；非0的有限值除以0 也一样
-- 如果有任意操作数为NaN, 则返回NaN；使用Infinity除以Infinity, 会返回NaN; 0 除以 0也会返回NaN
-- 如果不是数值的数，则会进行`Number()`转换，然后进行上诉规则
-
-取模操作符会遵循以下规则：
-
-- 如果被除数是无限制，除数是有限值；有限值除以0；Infinity除以Infinity，都会返回NaN
-- 被除数是有限值，除数是无限制，则返回除数
-- 被除数是0，除数不是0，则返回0
-- 如果不是数值的数，则会进行`Number()`转换，然后进行上诉规则
-
-ES7新增了指数操作符：`Math.pow()` -> `**`
-
-加法操作符遵循规则如下：
-
-- NaN计算返回NaN
-- Infinity 进行计算返回 Infinity，符号位保留。但是Infinity和自己进行计算返回NaN
-- 0 与 0 进行计算返回0， 符号位两个都是负号，则返回`-0`，其他返回`+0`
-- 操作数字符串，使用如下规则：
-  - 如果两个操作数都是字符串则进行拼接
-  - 如果只有一个操作数是字符串，则将另一个转为字符串，然后进行拼接。
-- 如果有一个是对象、数值、bool,则调用toString()方法以获取字符串，然后在应用前面的关于字符串规则。对于undefined和null,则调用String()函数，分别获取"undefined"、"null"
-
-减法操作符遵循规则如下：
-
-- NaN计算返回NaN
-- 同符号 Infinity进行计算返回NaN, 否则返回Infinity, 符号位保留第一位的符号
-- 0 与 0 进行计算返回0， 符号位两个不同负号，则返回`-0`，想同返回`+0`
-- 如果任一操作数是字符串、bool、null或undefined，则会使用Number()将其转换为数值，然后根据前面执行数学运算。如果转换结果为NaN,则计算结果是NaN
-- 如果任一操作数是对象，则调用其valueOf()方法，取得表示它的数值。如果该值是NaN,则减法计算的结果是NaN.如果对象没有valueOf()方法，则调用其toString()方法，然后在将得到的字符串转为数值。
-
-## 关系操作符
-
-关系运算符比较两个值得操作，包括`小于（<）`、`大于（>）`、`小于等于（<=）`、`大于等于（>=）`。这几个操作符都返回bool值，遵循规则如下：
-
-- 如果操作符都是数值，则直接比较
-- 任何涉及NaN都会返回false
-- 如果操作数是字符串，则逐个对比字符串中的编码（注意：大写字母小于小写字母）。
-- 如果任一操作数是数值，则将另一个转换为数值，执行比较大小
-- 如果任一操作数是对象，则调用其valueOf方法，取得结果后再根据前面的规则执行比较；如果没有valueOf则调用toString方法，取得结果后再根据前面的规则执行比较
-- 如果任一操作数是bool值，则将其转换为数值，然后执行比较
-
-## 相等运算符
-
-不全等`==`和不相等`!=`遵循如下规则：
-
-- 如果任一操作数是bool值，则将其转换为数值再比较是否相等
-- 如果一个操作数是字符串，另一个是数值，则会将字符串转换为数值（Number），再比较是否相等
-- 如果一个操作数是对象，另一个不是，则调用对象的valueOf()方法取得其原始值，再根据前面的规则进行比较
-- null 与 undefined 相等
-- null 与 undefined 不能转换为其他值进行比较（例如 `null == 0`、`undefined == 0`, 都是返回false）
-- 如果任意操作数是NaN,则相等操作符返回false,不相等操作符返回true.
-- 如果两个操作数都是对象，则比较它们是不是同一个对象。如果两个操作数都指向同一个对象地址
-
-`全等`和`不全等`规则是：在比较的时候不转换操作数进行比较。
-
-## 语句
-
-
-```javascript
-// 1. if语句：判断会涉及隐式类型转换
-if(condition) {
-    
-} else if(condition) {
-    
-} else { }
-
-// do-while: 先执行循环体里面的内容，然后执行退出条件进行求值
-do {
-  // staement
-} while(expression)
-
-// while
-while(expression) {}
-
-// for-in 用于枚举对象中的非符号键属性
-Object.defineProperty(target, key, {
-  configurable: true,
-  enumerable: false, // 设置不可枚举
-  writable: true,
-  value,
-})
-for(const key in target) {}
-// for-of 语句是一种严格的迭代语句，用于遍历可迭代对象元素，一般用于数组
-for(const item of arr) {}
-
-/**
- * break、continue、return
- *      break 用于立即退出循环。而continue 只是退出当前循环（不执行后面代码），下一次接着继续
- *      return 退出函数作用域
- */
-
-// with 将代码作用域设置为特定的对象（不推荐使用）
-
-
-```
 
 
 
