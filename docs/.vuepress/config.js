@@ -1,6 +1,6 @@
 import {defaultTheme, defineUserConfig} from "vuepress"
 import navbar from './user-config/navbar'
-import sidebar from './user-config/sidebar'
+import sidebar from './user-config/sidebar/index'
 import markdownItMathjax3 from 'markdown-it-mathjax3'
 
 export default defineUserConfig ({

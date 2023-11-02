@@ -1,6 +1,15 @@
-export { default as vue } from './vue'
-export { default as js } from './js'
-export { default as node } from './node'
-export { default as c } from './c'
-export { default as computed } from './computed'
-export { default as java } from './java'
+import web from './web'
+import server from './server'
+import c from './c'
+import computed from './computed'
+import java from './java'
+
+export default {
+  ...web,
+  ...server,
+  ...c,
+  ...computed,
+  ...java
+}
+
+

@@ -6,58 +6,136 @@ export default [
     link: '/'
   },
   {
-    text: '计算机',
+    text: '基础',
     children: [
       {
         text: '计算机网络',
-        link: '/Computed/network/'
+        link: '/base/network/'
       },
       {
         text: 'HTTP权威指南',
-        link: '/Computed/http/base.md'
+        link: '/base/http/base.md'
       }
     ]
   },
   {
-    text: 'JS',
+    text: '大前端',
     children: [
       {
-        text: 'JavaScript',
-        link: '/JS/base/base.md',
+        text: '基础',
+        children: [
+          {
+            text: 'JavaScript',
+            link: '/web/js/base.md',
+          },
+          {
+            text: 'TypeScript',
+            link: '/web/ts/base.md'
+          },
+        ]
       },
       {
-        text: 'Vue2.x实现',
-        link: '/JS/vue2.x'
+        text: '框架',
+        children: [
+          {
+            text: 'Vue',
+            link: '/web/vue/vue2/base.md'
+          },
+          {
+            text: 'React',
+            link: '/web/react/base.md'
+          },
+        ]
       },
       {
-        text: 'Element-Plus',
-        link: '/JS/Element-Plus'
+        text: '前端工程化',
+        children: [
+          {
+            text: 'node',
+            link: ''
+          },
+          {
+            text: 'Vite',
+            link: '/web/vite/base.md'
+          },
+          {
+            text: 'Webpack',
+            link: '/web/webpack/base.md'
+          },
+          {
+            text: 'Rollup',
+            link: '/web/rollup/base.md'
+          },
+          {
+            text: 'esbuild',
+            link: '/web/esbuild/base.md'
+          },
+        ]
       },
       {
-        text: 'TypeScript',
-        link: '/JS/TS'
-      },
-      {
-        text: 'Node',
-        link: '/JS/node'
+        text: '跨端',
+        children: [
+          {
+            text: 'Flutter',
+            link: '/web/flutter/dart.md'
+          },
+          {
+            text: 'uni-app',
+            link: '/web/uni-app/base.md'
+          }
+        ]
       }
-    ]
+    ],
   },
+
   {
-    text: 'Java',
+    text: '服务端',
     children: [
       {
-        text: 'Java SE',
-        link: '/Java/base/base.md'
-      }
-    ]
-  },
-  {
-    text: 'C&CPP',
-    children: [
+        text: 'node',
+        children: [
+          {
+            text: 'node',
+            link: '/server/node/base.md'
+          }
+        ]
+      },
+
       {
-        text: 'C',
-        link: '/C/base/base.md'
+        text: 'Java',
+        children: [
+          {
+            text: 'Java SE',
+            link: '/server/java/base/base.md'
+          }
+        ]
+      },
+
+      {
+        text: '数据库',
+        children: [
+          {
+            text: 'MySQL',
+            link: '/server/node/base.md'
+          },
+          {
+            text: 'redis',
+            link: '/server/node/base.md'
+          },
+          {
+            text: 'mongodb',
+            link: '/server/node/base.md'
+          }
+        ]
+      },
+      {
+        text: '工具',
+        children: [
+          {
+            text: 'nginx',
+            link: '/server/node/base.md'
+          }
+        ]
       }
     ],
   },
