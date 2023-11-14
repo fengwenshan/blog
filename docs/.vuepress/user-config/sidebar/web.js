@@ -96,7 +96,16 @@ export default {
       text: 'Vite',
       children: [
         '/web/vite/base.md',
-        // '/web/vite/base.md'
+        '/web/vite/tools.md',
+        '/web/vite/hmr.md',
+        '/web/vite/dev.md',
+        '/web/vite/server.md',
+        '/web/vite/build.md',
+        '/web/vite/optimize-deps.md',
+        '/web/vite/rollup.md',
+        '/web/vite/esbuild.md',
+        '/web/vite/plugins.md',
+        '/web/vite/origin.md',
       ]
     }
   ]

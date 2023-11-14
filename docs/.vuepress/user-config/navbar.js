@@ -52,7 +52,7 @@ export default [
         children: [
           {
             text: 'node',
-            link: ''
+            link: '/web/node/base.md'
           },
           {
             text: 'Vite',
@@ -61,14 +61,6 @@ export default [
           {
             text: 'Webpack',
             link: '/web/webpack/base.md'
-          },
-          {
-            text: 'Rollup',
-            link: '/web/rollup/base.md'
-          },
-          {
-            text: 'esbuild',
-            link: '/web/esbuild/base.md'
           },
         ]
       },
@@ -92,16 +84,6 @@ export default [
     text: '服务端',
     children: [
       {
-        text: 'node',
-        children: [
-          {
-            text: 'node',
-            link: '/server/node/base.md'
-          }
-        ]
-      },
-
-      {
         text: 'Java',
         children: [
           {
@@ -110,21 +92,20 @@ export default [
           }
         ]
       },
-
       {
         text: '数据库',
         children: [
           {
             text: 'MySQL',
-            link: '/server/node/base.md'
+            link: '/server/mysql/base.md'
           },
           {
             text: 'redis',
-            link: '/server/node/base.md'
+            link: '/server/redis/base.md'
           },
           {
             text: 'mongodb',
-            link: '/server/node/base.md'
+            link: '/server/mongodb/base.md'
           }
         ]
       },
@@ -133,8 +114,16 @@ export default [
         children: [
           {
             text: 'nginx',
-            link: '/server/node/base.md'
-          }
+            link: '/server/nginx/base.md'
+          },
+          {
+            text: 'docker',
+            link: '/server/docker/base/base.md'
+          },
+          {
+            text: 'svn & git',
+            link: '/server/git/base.md'
+          },
         ]
       }
     ],
