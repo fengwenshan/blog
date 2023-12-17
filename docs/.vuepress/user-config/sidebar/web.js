@@ -108,6 +108,14 @@ export default {
         '/web/vite/origin.md',
       ]
     }
+  ],
+  '/web/webpack': [
+    {
+      text: 'Webpack',
+      children: [
+        '/web/webpack/base.md'
+      ]
+    }
   ]
 }
 
