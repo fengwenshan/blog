@@ -1,0 +1,70 @@
+# 工具 Schema 设计
+
+## 本章目标
+
+这一章要解决的是：为什么工具很多时候“能跑但不稳”，以及怎么通过更严格的 schema 提高稳定性。
+
+---
+
+## 为什么 schema 很重要
+
+如果工具描述不清、参数不严格，模型就可能：
+
+- 选错工具
+- 传错参数
+- 多传字段
+- 少传必要字段
+
+---
+
+## 设计原则
+
+1. 工具名要清楚
+2. 描述要具体
+3. 参数字段要最小化
+4. 枚举和格式尽量明确
+5. 禁止不必要的额外字段
+
+---
+
+## 示例
+
+```python
+query_order_tool = {
+    "type": "function",
+    "name": "query_order_status",
+    "description": "根据订单号查询订单当前状态，仅用于订单状态查询，不用于支付退款判断",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "order_id": {
+                "type": "string",
+                "description": "订单号，例如 A1001",
+            }
+        },
+        "required": ["order_id"],
+        "additionalProperties": False,
+    },
+}
+```
+
+---
+
+## 常见坑
+
+- 一个工具职责太多
+- 描述过短
+- 参数字段太自由
+- 不限制 `additionalProperties`
+
+---
+
+## 本章小结
+
+工具设计越清楚，模型乱调用的概率越低。
+
+---
+
+## 下一章
+
+schema 设计好后，还要解决多个工具之间如何选择：[工具路由与执行](./tool-routing)

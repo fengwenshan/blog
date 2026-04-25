@@ -1,0 +1,88 @@
+[
+  {
+    "type": "dir-section-header",
+    "label": "Prompt基础",
+    "name": "module-1",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "让模型思考——推理增强技术",
+    "name": "module-2",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "让模型动手——工具调用能力",
+    "name": "module-3",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "让模型知道——知识接入能力",
+    "name": "module-4",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "整合为Agent——推理、行动与知识的融合",
+    "name": "module-5",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "Prompt优化与自动化",
+    "name": "module-6",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "高级检索技术",
+    "name": "module-7",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "模型微调与Prompt的协同",
+    "name": "module-8",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "生产级LLM应用架构",
+    "name": "module-9",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "安全、伦理与鲁棒性",
+    "name": "module-10",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "多模态Prompt工程",
+    "name": "module-11",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "领域专题实践",
+    "name": "module-12",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "未来趋势与研究前沿",
+    "name": "module-13",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "项目实战",
+    "name": "module-14",
+    "collapsible": false
+  }  
+]
+
+

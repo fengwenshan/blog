@@ -1,0 +1,136 @@
+
+
+# 基本配置
+
+
+## Spring-Boot启动
+
+
+[官方文档](https://spring.io/quickstart)
+
+
+```shell
+> tree
+.
+├── pom.xml # Maven 配置文件
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── com 
+│   │   │       └── wenshan # com.wenshan 公司域名倒写(Group)
+│   │   │           └── demo # 项目名称（Artifact）
+│   │   │               └── DemoApplication.java # Application.java # 启动类
+│   │   └── resources
+│   │       ├── static/                        # 静态资源（CSS、JS等）
+│   │       ├── templates/                      # 模板文件（如 Thymeleaf）
+│   │       └── application.properties # 配置文件（也可用 yml）
+│   └── test # 测试代码
+│       └── java 
+└── target
+    ├── classes
+    │   ├── application.properties
+    │   └── com
+    │       └── wenshan
+    │           └── demo
+    │               └── DemoApplication.class
+    └── generated-sources
+        └── annotations
+```
+
+- 配置jdk: idea右上角settings → Project Structure  → 然后分别配置Project、SDKs
+- 项目识别maven: 右键点击pom.xml，选择“Add as Maven Project”或“Link Maven Project”，加载maven。
+- `application.properties` 添加`server.port=8081` 默认不写就是8080
+- 然后就能去DemoApplication.java里面跑项目 `http://127.0.0.1:8081/hello`
+
+
+```java
+package com.wenshan.demo;  // 包声明必须与目录结构一致
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@SpringBootApplication          // 核心注解，组合了 @Configuration、@EnableAutoConfiguration、@ComponentScan
+@RestController                 // 为了测试临时加的，实际开发中通常会单独写 Controller 类
+public class DemoApplication {
+
+    public static void main(String[] args) {
+        // 启动 Spring Boot 应用
+        SpringApplication.run(DemoApplication.class, args);
+    }
+
+    @GetMapping("/hello")
+    public String hello() {
+        return "Hello, Spring Boot!";
+    }
+}
+```
+
+```xml
+<!-- pom.xml -->
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- 项目基本信息 -->
+    <groupId>com.wenshan</groupId>
+    <artifactId>demo</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <name>demo</name>
+    <description>Manual Spring Boot project</description>
+
+    <!-- 继承 Spring Boot 的父 POM，用于管理依赖版本 -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.7.14</version>  <!-- 可以根据需要选择版本，如 3.x -->
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <properties>
+        <java.version>11</java.version>  <!-- 与你的 JDK 版本一致，如 8、11、17 -->
+    </properties>
+
+    <dependencies>
+        <!-- Spring Web 依赖，用于构建 REST API -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- 可选：热部署工具，开发时修改代码自动重启 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <scope>runtime</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <!-- 测试依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <!-- Spring Boot Maven 插件，用于打包和运行 -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
+```
+
+## 配置docker
+

@@ -1,0 +1,27 @@
+[
+  {
+    "type": "dir-section-header",
+    "label": "基础",
+    "name": "basic"
+  },
+  {
+    "type": "dir-section-header",
+    "label": "框架",
+    "name": "framework"
+  },
+  {
+    "type": "dir-section-header",
+    "label": "Node",
+    "name": "node"
+  },
+  {
+    "type": "dir-section-header",
+    "label": "打包器",
+    "name": "bundler"
+  },
+  {
+    "type": "dir-section-header",
+    "label": "简历",
+    "name": "resume"
+  }
+]

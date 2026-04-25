@@ -1,0 +1,27 @@
+[
+  {
+    "text": "前端",
+    "link": "/web/basic/html&css/flex",
+    "activeMatch": "^/web/"
+  },
+  {
+    "text": "Python",
+    "link": "/Python",
+    "activeMatch": "^/Python/"
+  },
+  {
+    "text": "Java",
+    "link": "/Java/module-1/chapter-0",
+    "activeMatch": "^/Java/"
+  },
+  {
+    "text": "大模型",
+    "link": "llm/index",
+    "activeMatch": "^/llm/"
+  },
+  {
+    "text": "大模型",
+    "link": "Prompt/module-1/chapter-0",
+    "activeMatch": "^/Prompt/"
+  }
+]

@@ -1,0 +1,124 @@
+# Function Calling 基础
+
+## 本章目标
+
+这一章会带你实现一次完整的工具调用闭环。
+
+---
+
+## 1. 一个最小工具函数
+
+```python
+def get_weather(city: str) -> dict:
+    fake_data = {
+        "北京": {"status": "晴", "temp": 26},
+        "上海": {"status": "多云", "temp": 28},
+        "深圳": {"status": "小雨", "temp": 30},
+    }
+    return fake_data.get(city, {"status": "未知", "temp": None})
+```
+
+---
+
+## 2. 工具描述
+
+```python
+weather_tool = {
+    "type": "function",
+    "name": "get_weather",
+    "description": "查询指定城市天气",
+    "parameters": {
+        "type": "object",
+        "properties": {
+            "city": {
+                "type": "string",
+                "description": "城市名称，例如北京、上海",
+            }
+        },
+        "required": ["city"],
+        "additionalProperties": False,
+    },
+}
+```
+
+---
+
+## 3. 工具调用闭环代码
+
+```python
+import json
+import os
+from dotenv import load_dotenv
+from openai import OpenAI
+
+load_dotenv()
+
+client = OpenAI(
+    api_key=os.environ["OPENAI_API_KEY"],
+    base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+)
+
+
+def run_weather_chat(question: str) -> str:
+    response = client.responses.create(
+        model=os.getenv("OPENAI_MODEL", "gpt-4.1-mini"),
+        input=question,
+        tools=[weather_tool],
+    )
+
+    for item in response.output:
+        if item.type == "function_call" and item.name == "get_weather":
+            args = json.loads(item.arguments)
+            tool_result = get_weather(args["city"])
+
+            second_response = client.responses.create(
+                model=os.getenv("OPENAI_MODEL", "gpt-4.1-mini"),
+                input=[
+                    {
+                        "type": "function_call_output",
+                        "call_id": item.call_id,
+                        "output": json.dumps(tool_result, ensure_ascii=False),
+                    }
+                ],
+                previous_response_id=response.id,
+            )
+            return second_response.output_text
+
+    return response.output_text
+```
+
+---
+
+## 4. 业务案例
+
+### 案例一：天气查询
+
+这是教学最小例子。
+
+### 案例二：订单状态查询
+
+把 `get_weather` 换成 `query_order_status(order_id: str)`，就更接近企业业务。
+
+### 案例三：支付状态排查
+
+再接入支付查询工具，就能辅助客服工单分析。
+
+---
+
+## 本章小结
+
+Function Calling 的完整闭环是：模型决策 -> 系统执行 -> 结果回传 -> 模型生成最终答案。
+
+---
+
+## 练习题
+
+1. 把天气查询改成订单查询
+2. 为工具调用增加异常处理
+3. 打印工具调用参数和结果
+
+---
+
+## 下一章
+
+工具能跑起来后，下一步要关注工具定义质量：[工具 Schema 设计](./tool-schema-design)

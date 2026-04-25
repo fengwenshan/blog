@@ -1,0 +1,60 @@
+# 移动端
+
+## vconsole日志
+
+```javascript
+<script src="https://cdn.bootcdn.net/ajax/libs/vConsole/3.15.1/vconsole.min.js"></script>
+<script>
+new VConsole()
+</script>
+```
+
+
+# 防止弹窗里面滚动，滚动页面
+
+```javascript
+/**
+ * 统计同时出现的全屏组件
+ * 蒙层放在body下面，然后使用fixed，在safari下，把地址栏滚动到下面去，然后打开弹窗，底部地址栏会空白弹起来
+ * 解决办法：给html，body加{ height: 100% }
+ * @en Count simultaneous full-screen components
+ *
+ * usePreventBodyScroll(visible, preventBodyScroll, initialBodyOverflow);
+ */
+
+let scrollTop = 0
+
+export function usePreventBodyScroll(visible: boolean) {
+  const addFullScreen = useCallback(() => {
+    // 在当前没有全屏组件出现时，记下body overflow的初始值
+    scrollTop = document.documentElement.scrollTop || document.body.scrollTop
+    document.body.style.top = `-${scrollTop}px`
+    document.body.style.top = '0px'
+    document.body.style.position = 'fixed'
+    document.body.style.overflow = 'hidden'
+  }, [])
+  /**
+   * 移除一个全屏组件时，根据剩余是否还有全屏组件判断是否需要还原overflow样式
+   * @en When removing a full-screen component, determine whether the overflow style needs to be restored according to whether there are any remaining full-screen components.
+   */
+  const removeFullScreen = useCallback(() => {
+    document.body.style.position = ''
+    document.body.style.overflow = ''
+    document.body.scrollTop = scrollTop
+    document.documentElement.scrollTop = scrollTop
+  }, [])
+  // 新出现一个全屏组件则计数+1，并设置body hidden样式
+  useEffect(() => {
+    if (visible) {
+      addFullScreen()
+      return () => {
+        // 如果这里visible为true，则说明即将隐藏组件或在展示时卸载组件
+        // @en If visible here is true, it means that the component is about to be hidden or unloaded when displayed.
+        if (visible) {
+          removeFullScreen()
+        }
+      }
+    }
+  }, [visible])
+}
+```

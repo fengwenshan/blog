@@ -1,0 +1,58 @@
+{
+  "compilerOptions": {
+    // 指定编译时要包含的内置库类型:
+    // - DOM：rspress 运行在浏览器环境，需要 DOM API（如 window、document）的类型定义；
+    // - ES2020：启用 ES2020 特性，适配 rspress 的现代 JS 运行时
+    "lib": ["DOM", "ESNext"], 
+    // 指定 JSX 编译方式:采用 React 17 + 的新 JSX 转换规则，无需手动导入import React from 'react'即可写 JSX，是 rspress（基于 React）的标准配置
+    "jsx": "react-jsx",
+    // 编译后的 JS 目标版本:输出 ES2020 版本的 JS 代码，兼顾现代浏览器兼容性和语法特性（如可选链、空值合并）
+    "target": "ES2020", 
+    // 只做类型检查，不生成 JS 文件:rspress 的代码打包由内置的 esbuild/rollup 处理，不需要 tsc 直接输出文件，此配置是 rspress 工程的核心特征
+    "noEmit": true,
+    // 跳过第三方库的类型检查: 加快编译速度，避免 node_modules 中第三方库（如 rspress 依赖）的类型定义不完整导致的报错
+    "skipLibCheck": true,
+    // 遵循 ES 标准的类字段定义: 适配 ES2022 + 的类字段规范，避免类属性的类型 / 行为异常
+    "useDefineForClassFields": true,
+
+    /* modules 专门适配 rspress 的 ES 模块体系： */
+    // 指定模块系统为最新 ES 模块：适配 rspress 的模块化方案（基于 import/export），支持最新的模块特性
+    "module": "ESNext",
+    // 强制所有文件视为模块：即使文件没有 import/export，也不会被当作全局脚本，避免变量作用域冲突
+    "moduleDetection": "force",
+    // 使用打包器的模块解析策略：替代传统的 Node 解析策略，适配 rspress 内置打包器的路径解析规则（如别名、MDX 文件解析）
+    "moduleResolution": "bundler",
+    // 严格保留模块语法：不自动转换类型导入（如import type），保证和 rspress 打包器的语法兼容
+    "verbatimModuleSyntax": true,
+    // 允许导入 JSON 文件并识别类型：rspress 中经常导入配置 JSON（如主题配置、导航配置），此配置是必需的
+    "resolveJsonModule": true,
+    // 允许导入.ts/.tsx 扩展名的文件：开发时可直接写import config from './config.ts'，rspress 打包器会自动处理扩展名转换
+    "allowImportingTsExtensions": true,
+    // 禁用未检查的副作用导入：避免导入未使用的模块（如 rspress 插件）导致的运行时错误
+    "noUncheckedSideEffectImports": true,
+    // 每个文件作为独立模块：确保每个文件的变量作用域独立，避免全局变量污染
+    "isolatedModules": true,
+
+    /* type checking */
+    // 开启严格类型检查：包括 null/undefined 检查、函数参数检查、对象属性检查等，确保代码质量
+    "strict": true,
+    // 禁用未使用的局部变量：避免定义但未使用的变量，保持代码整洁
+    "noUnusedLocals": true,
+    // 禁用未使用的函数参数：避免定义但未使用的参数，保持代码整洁
+    "noUnusedParameters": true,
+    // 别名
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["docs/*"],
+    },
+  },
+  // 包含的文件目录:
+  // - docs：文档源文件目录，rspress 会从这里读取 Markdown 文件和 MDX 文件
+  // - theme：自定义主题目录，包含 rspress 主题的组件和样式
+  // - rspress.config.ts：rspress 配置文件，包含站点配置、导航配置、插件配置等
+  "include": ["docs", "theme", "rspress.config.ts", "mdx.d.ts"],
+  // 开启 MDX 文件的类型检查：确保 MDX 文件中的 React 组件类型正确，避免运行时错误
+  "mdx": {
+    "checkMdx": true
+  }
+}

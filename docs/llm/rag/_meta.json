@@ -1,0 +1,12 @@
+[
+  "index",
+  "document-processing",
+  "chunking",
+  "embedding-vector-store",
+  "retrieval",
+  "rerank",
+  "hybrid-search",
+  "query-rewrite",
+  "rag-evaluation",
+  "rag-production"
+]

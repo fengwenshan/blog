@@ -1,0 +1,62 @@
+[
+  "index",
+  "environment",
+  "python-llm-basics",
+  "llm-basics",
+  "model-api-basics",
+  {
+    "type": "dir-section-header",
+    "label": "模块二：Prompt 与输出控制",
+    "name": "prompt",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "模块三：工具调用",
+    "name": "tools",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "模块四：RAG 全链路",
+    "name": "rag",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "模块五：Agent 系统设计",
+    "name": "agent",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "模块六：LangChain",
+    "name": "langchain",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "模块七：LangGraph",
+    "name": "langgraph",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "模块八：工程化与项目",
+    "name": "engineering",
+    "collapsible": false
+  },
+  {
+    "type": "dir-section-header",
+    "label": "模块九：项目实战",
+    "name": "projects",
+    "collapsible": false
+  },
+  "career",
+  {
+    "type": "dir-section-header",
+    "label": "OpenCode 实践",
+    "name": "opencode",
+    "collapsible": false
+  }
+]

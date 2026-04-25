@@ -1,0 +1,21 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    // 构建输出目录
+    "outDir": "dist",
+    // 入口源码目录
+    "rootDir": "src",
+    // 生成类型声明文件
+    "declaration": true,
+    // 生成声明文件的 sourcemap
+    "declarationMap": true,
+    // 需要输出 JS + d.ts，不仅仅输出 d.ts
+    "emitDeclarationOnly": false,
+    // 子包需要实际产物，因此允许输出
+    "noEmit": false,
+    // 需要输出 JS 时禁用该选项，避免 allowImportingTsExtensions 报错
+    "allowImportingTsExtensions": false
+  },
+  // 仅包含插件源码
+  "include": ["src"]
+}

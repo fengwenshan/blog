@@ -1,0 +1,322 @@
+# tsconfig.json 配置详细解读
+
+`tsconfig.json` 是 TypeScript 项目的配置文件，用于指定编译选项、包含的文件、排除的文件等。它位于项目根目录，TypeScript 编译器（tsc）会读取此文件来确定如何编译 TypeScript 代码。
+
+## 1. 基本结构
+
+一个典型的 `tsconfig.json` 文件如下：
+
+```json
+{
+  "compilerOptions": {
+    // 编译选项
+  },
+  "include": [
+    // 包含的文件或目录
+  ],
+  "exclude": [
+    // 排除的文件或目录
+  ],
+  "files": [
+    // 明确指定的文件
+  ],
+  "extends": "path/to/base/tsconfig.json", // 继承其他配置
+  "references": [
+    // 项目引用，用于 monorepo
+  ]
+}
+```
+
+## 2. compilerOptions 详细解读
+
+`compilerOptions` 是最重要的部分，包含了编译器的各种选项。
+
+### 目标和模块
+
+- **target**: 指定 ECMAScript 目标版本，如 `"es5"`, `"es2015"`, `"es2020"` 等。默认 `"es5"`。
+- **module**: 指定模块系统，如 `"commonjs"`, `"amd"`, `"es2020"`, `"esnext"` 等。默认根据 target 推断。
+- **lib**: 指定包含的库文件，如 `["es2020", "dom"]`。默认根据 target 包含相应库。
+- **moduleResolution**: 模块解析策略，如 `"node"`, `"classic"`。默认 `"node"`。
+
+### 类型检查
+
+- **strict**: 启用所有严格类型检查选项。推荐设置为 `true`。
+- **noImplicitAny**: 不允许隐式的 `any` 类型。默认 `false`。
+- **strictNullChecks**: 启用严格的 null 检查。默认 `false`。
+- **strictFunctionTypes**: 启用函数类型的严格检查。默认 `false`。
+- **noImplicitReturns**: 确保函数所有代码路径都有返回值。默认 `false`。
+- **noFallthroughCasesInSwitch**: 在 switch 语句中不允许 case 穿透。默认 `false`。
+- **noUncheckedIndexedAccess**: 防止对索引访问的不安全访问。默认 `false`。
+
+### 输出
+
+- **outDir**: 指定输出目录，如 `"dist"`。
+- **rootDir**: 指定源代码根目录。
+- **declaration**: 生成 `.d.ts` 文件。默认 `false`。
+- **declarationDir**: 指定声明文件的输出目录。
+- **sourceMap**: 生成 source map 文件。默认 `false`。
+- **removeComments**: 移除注释。默认 `false`。
+
+### 路径和解析
+
+- **baseUrl**: 解析非相对模块的基路径。
+- **paths**: 路径映射，如 `"@/*": ["src/*"]`。
+- **resolveJsonModule**: 允许导入 JSON 文件。默认 `false`。
+- **allowSyntheticDefaultImports**: 允许从没有默认导出的模块中默认导入。默认 `false`。
+- **esModuleInterop**: 启用 ES 模块互操作性。默认 `false`。
+
+### 其他选项
+
+- **skipLibCheck**: 跳过库文件的类型检查。默认 `false`。
+- **forceConsistentCasingInFileNames**: 强制文件名大小写一致。默认 `false`。
+- **experimentalDecorators**: 启用实验性装饰器。默认 `false`。
+- **emitDecoratorMetadata**: 为装饰器发出元数据。默认 `false`。
+- **allowJs**: 允许编译 JavaScript 文件。默认 `false`。
+- **checkJs**: 对 JavaScript 文件进行类型检查。默认 `false`。
+- **jsx**: JSX 代码的处理方式，如 `"react"`, `"preserve"`。
+- **incremental**: 启用增量编译。默认 `false`。
+- **tsBuildInfoFile**: 指定增量编译信息文件。
+
+## 3. 其他顶级选项
+
+- **include**: 数组，指定要包含的文件或目录的 glob 模式。默认 `["**/*"]`。
+- **exclude**: 数组，指定要排除的文件或目录的 glob 模式。默认 `["node_modules", "dist"]`。
+- **files**: 数组，明确指定要编译的文件列表。如果指定，则 `include` 和 `exclude` 被忽略。
+- **extends**: 字符串，继承另一个 `tsconfig.json` 文件的路径。
+- **references**: 数组，用于项目引用，支持 monorepo。每个引用包含 `path` 属性。
+
+## 4. 通用配置示例
+
+### 基础配置
+
+适用于简单的 TypeScript 项目：
+
+```json
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "commonjs",
+    "lib": ["es2018"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+### 严格配置
+
+启用所有严格检查，适合高质量项目：
+
+```json
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "esnext",
+    "lib": ["es2020", "dom"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "sourceMap": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+}
+```
+
+### React 项目配置
+
+适用于使用 React 的项目：
+
+```json
+{
+  "compilerOptions": {
+    "target": "es2018",
+    "module": "esnext",
+    "lib": ["es2018", "dom"],
+    "jsx": "react-jsx",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "declaration": true,
+    "sourceMap": true,
+    "moduleResolution": "node",
+    "allowJs": true,
+    "checkJs": false
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
+```
+
+## 5. 支持 Monorepo 的通用配置
+
+Monorepo 项目通常使用项目引用（references）来管理多个子项目。
+
+### 根目录 tsconfig.json
+
+```json
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "module": "esnext",
+    "lib": ["es2020"],
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true
+  },
+  "files": [],
+  "references": [
+    { "path": "./packages/package-a" },
+    { "path": "./packages/package-b" }
+  ]
+}
+```
+
+### 子项目配置
+
+在 Monorepo 中，不同类型的子项目有不同的配置需求。以下是常见类型的配置示例。
+
+#### 应用/工程项目配置
+
+适用于前端应用、CLI 工具等需要完整构建和运行的项目。
+
+```json
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "composite": true,
+    "declaration": false, // 应用项目通常不需要生成声明文件
+    "target": "es2018",
+    "module": "esnext",
+    "lib": ["es2018", "dom"],
+    "moduleResolution": "node",
+    "allowJs": true,
+    "checkJs": false,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"],
+  "references": [
+    { "path": "../shared" } // 依赖共享库
+  ]
+}
+```
+
+#### 库项目配置
+
+适用于纯 TypeScript/JavaScript 库，提供 API 给其他项目使用。
+
+```json
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "composite": true,
+    "declaration": true,
+    "declarationDir": "./dist/types",
+    "emitDeclarationOnly": false,
+    "target": "es2020",
+    "module": "esnext",
+    "lib": ["es2020"],
+    "moduleResolution": "node",
+    "allowJs": false,
+    "resolveJsonModule": false,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts", "**/*.stories.*"],
+  "references": [
+    { "path": "../utils" } // 依赖工具库
+  ]
+}
+```
+
+#### 组件库项目配置
+
+适用于 UI 组件库，需要处理 JSX、样式和可能的 CSS Modules。
+
+```json
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "composite": true,
+    "declaration": true,
+    "declarationDir": "./dist/types",
+    "emitDeclarationOnly": false,
+    "target": "es2018",
+    "module": "esnext",
+    "lib": ["es2018", "dom"],
+    "jsx": "react-jsx",
+    "moduleResolution": "node",
+    "allowJs": false,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "incremental": true,
+    "tsBuildInfoFile": "./dist/tsconfig.tsbuildinfo",
+    "plugins": [
+      {
+        "name": "typescript-plugin-css-modules"
+      }
+    ]
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "**/*.test.tsx", "**/*.spec.tsx", "**/*.stories.tsx"],
+  "references": [
+    { "path": "../core" }, // 依赖核心库
+    { "path": "../theme" } // 依赖主题库
+  ]
+}
+```
+
+### 说明
+
+- **composite**: 启用项目引用，必须设置为 `true`。
+- **references**: 指定依赖的其他项目路径。
+- 使用 `extends` 继承根配置，确保一致性。
+- 根配置的 `files` 设为空数组，因为编译通过引用处理。
+
+这样配置可以实现增量编译和更好的依赖管理。

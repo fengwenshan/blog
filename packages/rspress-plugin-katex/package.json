@@ -1,0 +1,45 @@
+{
+  "name": "@rspress-plugin/katex",
+  "version": "0.1.0",
+  "description": "Rspress plugin for KaTeX",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "keywords": [
+    "rspress",
+    "rspress-plugin",
+    "katex"
+  ],
+  "author": "",
+  "license": "MIT",
+  "packageManager": "pnpm@10.14.0",
+  "peerDependencies": {
+    "@rspress/core": ">=2"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.2",
+    "unified": "^11.0.5"
+  },
+  "dependencies": {
+    "rehype-katex": "^7.0.1",
+    "remark-math": "^6.0.0",
+    "unist-util-visit": "^5.1.0"
+  }
+}

@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+/* 首页模块样式 */
+.modules-container {
+  padding: 4rem 0;
+  text-align: center;
+}
+
+.modules-title {
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.modules-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.module-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 2rem;
+  text-decoration: none;
+  color: #333;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 1px solid #e5e7eb;
+}
+
+.module-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.module-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.module-title {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: #111;
+}
+
+.module-description {
+  color: #666;
+  line-height: 1.5;
+}
+
+.feature-section {
+  background: #f9fafb;
+  padding: 4rem 0;
+  margin-top: 2rem;
+}
+
+.feature-title {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.feature-card {
+  text-align: center;
+  padding: 2rem;
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.feature-subtitle {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+  color: #111;
+}
+
+.feature-text {
+  color: #666;
+  line-height: 1.5;
+}
+
+/* 全局响应式样式 */
+@media (max-width: 768px) {
+  .rspress-nav-bar {
+    padding: 0 1rem;
+  }
+  
+  .rspress-hero {
+    padding: 2rem 1rem;
+  }
+  
+  .rspress-hero h1 {
+    font-size: 2rem;
+  }
+  
+  .rspress-hero p {
+    font-size: 1rem;
+  }
+  
+  .modules-grid,
+  .feature-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modules-title,
+  .feature-title {
+    font-size: 1.5rem;
+  }
+  
+  .module-card,
+  .feature-card {
+    padding: 1.5rem;
+  }
+}
+
+/* 自定义品牌颜色 */
+:root {
+  --rp-c-brand: #0095ff;
+  --rp-c-brand-light: #33adff;
+  --rp-c-brand-lighter: #c6e0fd;
+  --rp-c-brand-dark: #0077ff;
+  --rp-c-brand-darker: #005fcc;
+  --rp-c-brand-tint: rgba(127, 163, 255, 0.16);
+}

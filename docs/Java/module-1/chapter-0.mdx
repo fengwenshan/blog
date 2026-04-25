@@ -1,0 +1,65 @@
+import { Tab, Tabs } from '@rspress/core/theme';
+
+
+# Java语法
+
+
+## 枚举
+
+- 枚举不能被继承，但可以实现接口，从而实现多态。
+
+<Tabs>
+<Tab label="ResultCode.java">
+```java
+package com.wenshan.demo.common.result;
+
+public enum ResultCode {
+    // 2xx 成功
+    SUCCESS(200, "成功"),
+
+    // 4xx 客户端错误
+    NOT_LOGIN(401, "未登录或者token已过期"),
+    FORBIDDEN(403, "无访问权限"),
+    SERVER_ERROR(500, "服务器错误"),
+    ;
+    private int code;
+    private String message;
+
+    public int getCode() {
+        return code;
+    }
+    public String getMessage() {
+        return message;
+    }
+
+    ResultCode(int code, String message) {
+        this.code = code;
+        this.message = message;
+    }
+}
+```
+</Tab>
+<Tab label="demoMain.java">
+```java
+import com.wenshan.demo.common.result.ResultCode;
+
+public class demoMain {
+    public static void main(String[] args) {
+        // SUCCESS
+        System.out.println(ResultCode.SUCCESS);
+        // 1329552164
+        System.out.println(ResultCode.SUCCESS.hashCode());
+        // SUCCESS
+        System.out.println(ResultCode.SUCCESS.name());
+        // SUCCESS
+        System.out.println(ResultCode.valueOf(ResultCode.SUCCESS.name()));
+        // 索引 0
+        System.out.println(ResultCode.SUCCESS.ordinal());
+        // 200 这里的code访问的是上面的 getCode
+        System.out.println(ResultCode.SUCCESS.getCode());
+
+    }
+}
+```
+</Tab>
+</Tabs>

@@ -1,0 +1,237 @@
+# 结构化输出
+
+## 本章目标
+
+这一章讨论从“聊天输出”走向“系统输出”的关键一步：结构化输出。
+
+读完后你应该能：
+
+- 理解为什么自然语言结果不够
+- 会用 `pydantic` 定义结构化结果
+- 理解模型输出、程序校验和业务处理之间的关系
+- 为后续 Tool Calling 和 Agent 打基础
+
+---
+
+## 为什么自然语言不够
+
+对于人来说，下面这段话很容易理解：
+
+```text
+我认为这个问题大概率属于支付异常，优先级偏高，建议立即排查回调链路。
+```
+
+但对于程序来说，这类输出很难稳定消费。
+
+系统更需要的是：
+
+```json
+{
+  "category": "payment_issue",
+  "priority": "high",
+  "suggestion": "检查支付回调链路与订单状态同步"
+}
+```
+
+这类结果可以直接：
+
+- 落库
+- 渲染 UI
+- 进入工作流
+- 交给后续工具继续处理
+
+---
+
+## 结构化输出链路图
+
+```mermaid
+flowchart LR
+    A[用户输入] --> B[LLM]
+    B --> C[JSON 输出]
+    C --> D[Pydantic 校验]
+    D --> E[业务逻辑]
+    E --> F[数据库 / 前端 / 工作流]
+```
+
+---
+
+## 1. 用 Pydantic 定义输出结构
+
+```python
+from pydantic import BaseModel, Field
+from typing import Literal
+
+
+class TicketAnalysis(BaseModel):
+    category: Literal["frontend", "backend", "payment", "infra"] = Field(
+        description="问题分类"
+    )
+    priority: Literal["low", "medium", "high"] = Field(description="优先级")
+    summary: str = Field(description="一句话总结")
+    next_action: str = Field(description="建议的下一步动作")
+```
+
+为什么这个结构重要？
+
+因为它明确规定了：
+
+- 允许哪些字段
+- 字段值大概应该长什么样
+- 哪些值是合法的
+
+---
+
+## 2. 让模型输出 JSON
+
+```python
+import json
+import os
+from dotenv import load_dotenv
+from openai import OpenAI
+
+load_dotenv()
+
+client = OpenAI(
+    api_key=os.environ["OPENAI_API_KEY"],
+    base_url=os.getenv("OPENAI_BASE_URL", "https://api.openai.com/v1"),
+)
+
+
+def analyze_ticket(text: str) -> TicketAnalysis:
+    prompt = f"""
+    你是一名工单分析助手。
+    请输出 JSON，字段必须是：category, priority, summary, next_action。
+    不要输出任何额外解释。
+
+    输入：{text}
+    """
+
+    response = client.responses.create(
+        model=os.getenv("OPENAI_MODEL", "gpt-4.1-mini"),
+        input=prompt,
+    )
+
+    data = json.loads(response.output_text)
+    return TicketAnalysis.model_validate(data)
+```
+
+---
+
+## 3. 为什么一定要做程序校验
+
+模型即使知道你想要 JSON，也仍可能：
+
+- 少字段
+- 多字段
+- 输出伪 JSON
+- 枚举值不合法
+
+所以工程上最重要的一条原则是：
+
+> 模型负责生成候选结果，程序负责做最终校验。
+
+---
+
+## 4. 一个更稳一点的重试思路
+
+```python
+from pydantic import ValidationError
+
+
+def safe_analyze_ticket(text: str, max_retries: int = 3) -> TicketAnalysis:
+    last_error = None
+    for _ in range(max_retries):
+        try:
+            return analyze_ticket(text)
+        except (json.JSONDecodeError, ValidationError) as exc:
+            last_error = exc
+    raise RuntimeError(f"结构化输出失败: {last_error}")
+```
+
+后面你在 Tool Calling 和 Agent 里会发现，这种“结构化输出 + 校验 + 重试”的思路非常常见。
+
+---
+
+## 5. 三个业务案例
+
+### 案例一：工单分类
+
+输出：
+
+- `category`
+- `priority`
+- `summary`
+
+### 案例二：简历评估
+
+输出：
+
+- `match_score`
+- `strengths`
+- `risks`
+
+### 案例三：前端错误摘要
+
+输出：
+
+- `issue_type`
+- `possible_causes`
+- `next_steps`
+
+这些场景的共同点都是：
+
+- 下游系统需要稳定字段，而不是聊天文本。
+
+---
+
+## 6. 和前端工程的类比
+
+如果你熟悉前端，可以把结构化输出理解成：
+
+- 模型负责返回数据
+- `pydantic` 像运行时版的 interface 校验
+- 前端或后端再基于这个稳定结构渲染和处理
+
+这和“接口契约”思维非常接近。
+
+---
+
+## 7. 常见坑
+
+### 坑一：只让模型“尽量按 JSON 输出”但不校验
+
+这在开发早期看起来能跑，后期会很不稳。
+
+### 坑二：Schema 设计太松
+
+如果允许太多自由值，程序侧还是难以稳定消费。
+
+### 坑三：把结构化输出当成万能解法
+
+结构化输出提升的是“可消费性”，不自动等于“事实一定正确”。
+
+---
+
+## 本章小结
+
+这一章最重要的结论是：
+
+- 结构化输出是从聊天系统走向程序系统的关键一步
+- 模型输出必须配合程序校验
+- `pydantic` 是结构化输出场景中非常重要的基础工具
+- 后面的 Tool Calling 和 Agent 都会大量依赖这种思维
+
+---
+
+## 练习题
+
+1. 自己定义一个 `ResumeScore` 模型
+2. 让模型输出这个结构并做校验
+3. 故意制造一次字段缺失，观察校验报错
+4. 写一个结构化输出失败后的重试函数
+
+---
+
+## 下一章
+
+结构化输出打好基础后，你就可以自然进入真正的外部能力连接： [工具调用导论](../tools/index)

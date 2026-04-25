@@ -1,0 +1,51 @@
+# 工具安全与边界
+
+## 本章目标
+
+这一章要解决的是：工具调用一旦连接真实系统，风险就会急剧上升，如何做安全控制。
+
+---
+
+## 常见风险
+
+- 越权查询
+- 错误工具调用
+- 高风险动作无确认
+- 日志泄露敏感信息
+- Prompt 注入诱导调用工具
+
+---
+
+## 基本原则
+
+1. 模型可以建议，不等于模型可以直接执行
+2. 真正执行必须由系统权限控制
+3. 高风险操作要人工确认
+4. 工具输入要二次校验
+5. 所有调用要留日志
+
+---
+
+## 例子：高风险动作确认
+
+```python
+HIGH_RISK_TOOLS = {"delete_order", "send_refund"}
+
+
+def guarded_execute_tool(name: str, arguments: dict, confirmed: bool = False):
+    if name in HIGH_RISK_TOOLS and not confirmed:
+        raise PermissionError("高风险工具需要人工确认")
+    return execute_tool(name, arguments)
+```
+
+---
+
+## 本章小结
+
+工具调用一旦进入真实业务系统，安全和权限控制就不是附加项，而是基础项。
+
+---
+
+## 下一章
+
+接下来进入整套教材的重点模块之一：[RAG 总览](../rag/index)

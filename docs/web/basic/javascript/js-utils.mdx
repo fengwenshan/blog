@@ -1,0 +1,111 @@
+# JS工具函数
+
+
+## 间接匹配字符串
+
+``` javascript
+function fuzzyMatch(targetText, keyword) {
+    // 将目标文本转换为小写，关键词保持原样，因为正则表达式将进行不区分大小写的匹配
+    const lowerTarget = targetText.toLowerCase();
+    // 构建一个正则表达式，关键词中的每个字符被`.`（匹配任意单个字符，除了换行符）包围，
+    // 并使用全局搜索(g)和不区分大小写(i)标志
+    const pattern = new RegExp(keyword.split('').join('.*?'), 'gi');
+    // 使用match方法尝试在目标文本中找到与模式匹配的所有子串
+    const matches = lowerTarget.match(pattern);
+    // 如果找到匹配项，则返回true，否则返回false
+    return matches !== null;
+}
+this.fuzzyMath(item.text, value)
+```
+
+## 复制
+
+```javascript
+function clipboard(value) {
+  const ta = document.createElement('textarea')
+  ta.value = value ?? ''
+  ta.style.position = 'absolute'
+  ta.style.opacity = '0'
+  document.body.appendChild(ta)
+  ta.select()
+  document.execCommand('copy')
+  ta.remove()
+}
+```
+
+## 阻止网页跳转
+
+```javascript
+window.addEventListener('beforeunload', function(event) { 
+    try {
+        alert('123123123')
+        debugger
+        throw new Error('234234')
+    } catch(err) {
+        console.error(err)
+        event.preventDefault(); // 阻止默认行为 
+    }
+});
+```
+
+## 拦截 window.open 调用
+
+```javascript
+// 保存原始的 window.open
+const originalOpen = window.open;
+// 重写 window.open
+window.open = function(url, target, features) {
+  // 👇 在这里统一做你想做的处理
+  console.log('拦截到 window.open 调用:', { url, target, features });
+  return originalOpen.call(window, url, target, features);
+};
+```
+
+## history 监听路由变化
+
+```javascript
+// 监听 SPA（单页应用）路由变化的常用 hack 方式
+function onRouteChange(callback) {
+  // 监听浏览器前进/后退
+  window.addEventListener("popstate", callback)
+
+  // 保存原始方法
+  const originalPush = history.pushState
+  const originalReplace = history.replaceState
+
+  // 重写 pushState
+  history.pushState = function (...args) {
+    const result = originalPush.apply(this, args)
+    callback()
+    return result
+  }
+
+  // 重写 replaceState
+  history.replaceState = function (...args) {
+    const result = originalReplace.apply(this, args)
+    callback()
+    return result
+  }
+}
+onRouteChange(() => {
+  debugger
+})
+```
+
+## 拦截弹窗
+
+如果这个放到弹窗组件中，弹窗关闭时，需要恢复路由
+
+```javascript
+export default {
+ mounted() {
+    window.history.pushState(null, null, window.location.href)
+    this.onpopstate = window.onpopstate
+    window.onpopstate = (event) => {
+      // 阻止页面返回的逻辑处理
+      window.onpopstate = this.onpopstate
+      return false
+    }
+ }
+}
+```

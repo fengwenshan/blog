@@ -1,0 +1,146 @@
+# Output Parser
+
+## 本章目标
+
+这一章讨论 LangChain 里非常实用的一类组件：Output Parser。
+
+它解决的问题很直接：
+
+> 模型给你的原始文本，如何更稳定地变成程序能直接使用的数据。
+
+读完后你应该能：
+
+- 理解 Output Parser 的价值
+- 使用基础 Parser 处理模型输出
+- 理解它和前面结构化输出章节的关系
+
+---
+
+## 为什么需要 Output Parser
+
+如果没有 Parser，你通常需要自己做：
+
+- 字符串清洗
+- JSON 解析
+- 结果提取
+- 错误处理
+
+当链路多起来时，这些逻辑很容易散落在项目里。
+
+LangChain 的 Output Parser，就是把这类重复逻辑统一抽象出来。
+
+---
+
+## 组件位置图
+
+```mermaid
+flowchart LR
+    A[PromptTemplate] --> B[ChatModel]
+    B --> C[OutputParser]
+    C --> D[Program-ready Result]
+```
+
+---
+
+## 1. 最简单的 `StrOutputParser`
+
+如果你只是希望得到纯文本结果，可以先用最简单的解析器。
+
+```python
+from langchain_core.output_parsers import StrOutputParser
+from langchain_openai import ChatOpenAI
+from langchain_core.prompts import ChatPromptTemplate
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "你是一名 AI 助手。"),
+    ("human", "请解释什么是 {topic}。"),
+])
+
+model = ChatOpenAI(model="gpt-4.1-mini")
+parser = StrOutputParser()
+
+chain = prompt | model | parser
+result = chain.invoke({"topic": "Agent"})
+print(result)
+```
+
+---
+
+## 2. 为什么它对工程有价值
+
+你可能会想：
+
+> 这不就是把 `result.content` 拿出来吗？
+
+是的，但它的工程价值在于：
+
+- 风格统一
+- 链路更可组合
+- 后续替换更复杂 parser 时成本低
+
+也就是说，它的意义不止在“少写一行代码”，而在于“统一抽象”。
+
+---
+
+## 3. 和结构化输出的关系
+
+前面你已经学过结构化输出的本质：
+
+- 模型输出要可被程序消费
+
+Output Parser 可以理解成这个目标在 LangChain 生态里的落地方式之一。
+
+也就是说：
+
+- 原生写法：你自己 parse
+- LangChain 写法：交给 parser 组件处理
+
+---
+
+## 4. 一个业务案例
+
+### 工单摘要生成
+
+假设你要做一个工单摘要助手：
+
+- Prompt 负责说明任务
+- Model 负责生成
+- Parser 负责输出统一文本结构
+
+如果将来要把输出升级成结构化对象，也只需要替换 Parser 逻辑，而不用把整条链路全改掉。
+
+---
+
+## 5. 常见坑
+
+### 坑一：以为 Parser 能自动解决所有结构化问题
+
+Parser 只能帮助组织和解析，前提仍然是 Prompt 要求足够清楚。
+
+### 坑二：不理解输出本身，就直接套 Parser
+
+最终还是会在调试时陷入混乱。
+
+---
+
+## 本章小结
+
+你现在应该记住：
+
+- Output Parser 的核心价值是把模型输出转成更稳定的程序结果
+- 它和结构化输出的目标一致，只是以 LangChain 组件形式呈现
+- 先理解最基础的 `StrOutputParser`，再逐步扩展到更复杂场景
+
+---
+
+## 练习题
+
+1. 用 `StrOutputParser` 写一个概念解释器
+2. 把一个原生 SDK 的文本输出封装思路，迁移成 LangChain Parser 思路
+3. 思考：什么时候你会从纯文本 Parser 升级到结构化 Parser
+
+---
+
+## 下一章
+
+接下来开始把 LangChain 用到一个真正重要的场景里：[LangChain RAG 实战](./rag-with-langchain)
