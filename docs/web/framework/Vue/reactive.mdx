@@ -1,0 +1,299 @@
+import { Tab, Tabs } from '@rspress/core/theme';
+
+
+# reactive
+
+[reactive官网地址](https://cn.vuejs.org/api/reactivity-core.html#reactive)
+
+## 类型
+
+```typescript
+function reactive<T extends object>(target: T): UnwrapNestedRefs<T>
+```
+
+## 详细信息
+
+响应式转换是“深层”的：它会影响到所有嵌套的属性。一个响应式对象也将深层地解包任何 `ref` 属性，同时保持响应性。
+
+值得注意的是，当访问到某个响应式数组或 `Map` 这样的原生集合类型中的 ref 元素时，不会执行 ref 的解包。
+
+若要避免深层响应式转换，只想保留对这个对象顶层次访问的响应性，请使用 `shallowReactive()` 作替代。
+
+返回的对象以及其中嵌套的对象都会通过 `ES Proxy` 包裹，因此不等于源对象，建议只使用响应式代理，避免使用原始对象。
+
+## 示例
+
+```typescript
+const obj = reactive({ count: 0 })
+obj.count++
+```
+
+ref 的解包：
+
+```typescript
+const count = ref(1)
+const obj = reactive({ count })
+
+// ref 会被解包
+console.log(obj.count === count.value) // true
+
+// 会更新 `obj.count`
+count.value++
+console.log(count.value) // 2
+console.log(obj.count) // 2
+
+// 也会更新 `count` ref
+obj.count++
+console.log(obj.count) // 3
+console.log(count.value) // 3
+```
+
+注意当访问到某个响应式数组或 Map 这样的原生集合类型中的 ref 元素时，不会执行 ref 的解包：
+
+```typescript
+const books = reactive([ref('Vue 3 Guide')])
+// 这里需要 .value
+console.log(books[0].value)
+
+const map = reactive(new Map([['count', ref(0)]]))
+// 这里需要 .value
+console.log(map.get('count').value)
+```
+
+将一个 ref 赋值给一个 reactive 属性时，该 ref 会被自动解包：
+
+```typescript
+const count = ref(1)
+const obj = reactive({})
+
+obj.count = count
+
+console.log(obj.count) // 1
+console.log(obj.count === count.value) // true
+```
+
+## 工具
+
+### isProxy()
+
+检查一个对象是否是由 `reactive()`、`readonly()`、`shallowReactive()` 或 `shallowReadonly()` 创建的代理。
+
+```typescript
+function isProxy(value: any): boolean
+```
+
+### isReactive()
+
+检查一个对象是否是由 `reactive()` 或 `shallowReactive()` 创建的代理。
+
+```typescript
+function isReactive(value: unknown): boolean
+```
+
+### isReadonly()
+
+
+检查传入的值是否为只读对象。只读对象的属性可以更改，但它们不能通过传入的对象直接赋值。
+
+通过 `readonly()` 和 `shallowReadonly()` 创建的代理都是只读的，类似于没有 set 函数的 computed() ref。
+
+```typescript
+function isReadonly(value: unknown): boolean
+```
+
+## 实现需求
+
+> `pnpm dev reactivity -f esm-browser` 启动浏览器环境，然后在dist下面新建html调试
+
+
+```html
+<!-- <script type="module" src="./vue.esm-browser.js" ></script> -->
+<script type="module" src="./reactivity.esm-browser.js"></script>
+<script type="module">
+  import { reactive } from './reactivity.esm-browser.js'
+  const original = {
+    name: 'why',
+    age: 18,
+    attrs: {
+      parentName: 'zhangsan'
+    }
+  }
+  const proxy = reactive(original)
+  const proxy1 = reactive(original)
+  const proxy2 = reactive(proxy1)
+  console.log('1.代理对象：', proxy)
+  console.log('1.原始对象与代理对象不同：', original === proxy)
+  console.log('2.重复代理同地址对象，返回同一代理对象：', proxy === proxy1)
+  console.log('3.嵌套对象代理：', proxy.attrs)
+  console.log('4.代理对象被代理,地址相等：', proxy1 === proxy2)
+</script>
+```
+
+### 实现对象代理
+
+
+<Tabs>
+<Tab label="1.代理对象">
+```typescript
+import { isObject } from '@vue/shared'
+export function reactive<T extends object>(target: T): T {
+  if(!isObject(target)) {
+    return target
+  }
+  // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy
+  return new Proxy(target, {
+    get(target, prop, receiver) {
+      return Reflect.get(target, prop, receiver)
+    },
+    set(target, prop, newVal, receiver) {
+      return Reflect.set(target, prop, newVal, receiver)
+    }
+  })
+}
+```
+</Tab>
+<Tab label="2.重复代理同地址对象，返回同一代理对象">
+```typescript
+import { isObject } from '@vue/shared'
+
+type Reactive<T extends object> = T
+
+function createReactiveObject<T extends object>(target: T): Reactive<T>
+function createReactiveObject(target: object): object {
+  if(!isObject(target)) {
+    return target
+  }
+  // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy
+  return new Proxy(target, {
+    get(target, prop, receiver) {
+      const val = Reflect.get(target, prop, receiver)
+      if(isObject(val)) {
+        return reactive(val)
+      }
+      return val
+    },
+    set(target, prop, newVal, receiver) {
+      return Reflect.set(target, prop, newVal, receiver)
+    }
+  })
+}
+
+export function reactive<T extends object>(target: T): T {
+  return createReactiveObject(target)
+}
+```
+</Tab>
+
+<Tab label="3.嵌套对象代理">
+```typescript
+import { isObject } from '@vue/shared'
+
+type Reactive<T extends object> = T
+
+function createReactiveObject<T extends object>(target: T): Reactive<T>
+function createReactiveObject(target: object): object {
+  if(!isObject(target)) {
+    return target
+  }
+  // https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy
+  return new Proxy(target, {
+    get(target, prop, receiver) {
+      const val = Reflect.get(target, prop, receiver)
+      if(isObject(val)) {
+        return reactive(val)
+      }
+      return val
+    },
+    set(target, prop, newVal, receiver) {
+      return Reflect.set(target, prop, newVal, receiver)
+    }
+  })
+}
+
+export function reactive<T extends object>(target: T): T {
+  return createReactiveObject(target)
+}
+```
+</Tab>
+
+<Tab label="4.代理对象被代理,地址相等">
+```typescript
+import { isObject } from '@vue/shared'
+
+// 缓存原始对象
+const proxyMap = new WeakMap()
+
+export interface Target {
+  // [ReactiveFlags.SKIP]?: boolean
+  [ReactiveFlags.IS_REACTIVE]?: boolean
+  // [ReactiveFlags.IS_READONLY]?: boolean
+  // [ReactiveFlags.IS_SHALLOW]?: boolean
+  [ReactiveFlags.RAW]?: any
+}
+
+export enum ReactiveFlags {
+  /** 判断一个值是否已经是响应式代理对象。 */
+  IS_REACTIVE = '__v_isReactive',
+  /** 获取响应式代理对象背后的原始对象 */
+  RAW = '__v_raw'
+}
+
+type Reactive<T> = T
+function createReactiveObject<T extends object>(target: T): Reactive<T>
+function createReactiveObject(target: Target): object {
+  if(!isObject(target)) {
+    return target
+  }
+  /*
+    当我去用代理对象访问属性的时候，就会触发get
+    判断 target 是否已经是代理，避免重复包装
+  */ 
+  if(target[ReactiveFlags.RAW]) {
+    return target
+  }
+  const existingProxy = proxyMap.get(target)
+  if(existingProxy) {
+    return existingProxy
+  }
+  //  https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Proxy
+  const proxy =  new Proxy(target, {
+    get(target, prop, receiver) {
+       if(prop === ReactiveFlags.RAW) {
+        return target
+      }
+      const val = Reflect.get(target, prop, receiver)
+      return isObject(val) ? reactive(val) : Reflect.get(target, prop, receiver)
+    },
+    set(target,  prop, newVal, receiver) {
+      return Reflect.set(target, prop, newVal, receiver)
+    }
+  })
+  proxyMap.set(target, proxy)
+  return proxy
+}
+
+export function reactive<T extends object>(target: T): T {
+  return createReactiveObject(target)
+}
+```
+
+</Tab>
+
+<Tab label="5.实现isReactive、isProxy">
+```typescript
+export const isReactive = (target: unknown): boolean => {
+  // 被代理过得就是会触发get,没有代理过得不会触发
+  return isObject(target) ? !!Reflect.get(target, ReactiveFlags.IS_REACTIVE)  : false
+}
+
+export const isProxy = (target: unknown): boolean => {
+  return isObject(target) ? !!Reflect.get(target, ReactiveFlags.RAW) : false
+}
+```
+</Tab>
+</Tabs>
+
+
+## [Ref实现](ref.mdx)
+
+

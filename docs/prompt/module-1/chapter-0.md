@@ -97,7 +97,6 @@ Miniconda3 Anaconda.Miniconda3 py313_25.9.1-3 Tag: miniconda winget
 
 大模型界的github, 先注册，然后添加token用来调用大模型
 
-![](./images/1.png)
 
 Hugging face 提供transformers库，用于加载和使用模型。
 > pip install transformers torch openai python-dotenv requests sentence-transformers
