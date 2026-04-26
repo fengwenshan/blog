@@ -346,8 +346,6 @@ const { foo, bar } = useFeatureX()
   ```typescript
 import { isReactive, ReactiveFlags, toRaw, toReactive } from './reactive'
 
-const IS_REF: ReactiveFlags.IS_REF = ReactiveFlags.IS_REF
-
 export interface Ref<T = any, S = T> {
   get value(): T
   set value(_: S)
@@ -359,7 +357,7 @@ class RefImpl<T = any> {
   // 响应类型
   private _value: T
 
-  public readonly [IS_REF]: true = true
+  public readonly [ReactiveFlags.IS_REF] = true
 
   constructor(rawValue: T) {
     this._rawValue = toRaw(rawValue)
@@ -393,6 +391,11 @@ export function isRef(value: any): value is Ref {
   
   // 判断类型，都不要用 Reflect.get
   return value ? value[ReactiveFlags.IS_REF] === true  : false
+}
+
+
+export function unRef<T = any>(ref: T | Ref<T>): T {
+  return isRef(ref) ? ref.value : ref
 }
 ```
 </Tab>
